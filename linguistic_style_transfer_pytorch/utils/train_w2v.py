@@ -2,6 +2,7 @@ from gensim.models import Word2Vec
 from gensim.models.word2vec import LineSentence
 from linguistic_style_transfer_pytorch.config import GeneralConfig
 
+config= GeneralConfig()
 
 def train_word2vec_model(text_file_path, model_file_path):
     # define training data

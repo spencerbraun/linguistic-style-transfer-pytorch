@@ -7,6 +7,7 @@ import math
 mconfig = ModelConfig()
 gconfig = GeneralConfig()
 
+use_cuda = True if torch.cuda.is_available() else False
 
 class AdversarialVAE(nn.Module):
     """
@@ -246,7 +247,10 @@ class AdversarialVAE(nn.Module):
         Returns samples drawn from the latent space constrained to
         follow diagonal Gaussian
         """
-        epsilon = torch.randn(mu.size(1))
+        if use_cuda:
+            epsilon = torch.randn(mu.size(1)).cuda()
+        else:
+            epsilon = torch.randn(mu.size(1))
         return mu + epsilon*torch.exp(log_var)
 
     def update_average_style_emb(self, style_emb, style_labels):

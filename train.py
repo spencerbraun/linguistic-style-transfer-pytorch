@@ -10,15 +10,14 @@ import pickle
 
 use_cuda = True if torch.cuda.is_available() else False
 
-
 if __name__ == "__main__":
 
     mconfig = ModelConfig()
     gconfig = GeneralConfig()
     weights = torch.FloatTensor(np.load(gconfig.word_embedding_path))
-    model = AdversarialVAE(inference=False, weight=weights)
+    model = AdversarialVAE(weight=weights)
     if use_cuda:
-        model = model.cuda()
+        model = model.to("cuda")
 
     #=============== Define dataloader ================#
     train_dataset = TextDataset(mode='train')

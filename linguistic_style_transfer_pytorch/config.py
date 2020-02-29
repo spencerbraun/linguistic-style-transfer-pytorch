@@ -21,9 +21,9 @@ class GeneralConfig:
         self.train_neg_reviews_file_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "sentiment.train.0.txt")
         self.train_text_file_path = os.path.join(
-            ROOT, "linguistic_style_transfer_pytorch", "data", "clean", "yelp_train_data.txt")
+            ROOT, "linguistic_style_transfer_pytorch", "data", "clean", "yelp_train_data.test")
         self.train_labels_file_path = os.path.join(
-            ROOT, "linguistic_style_transfer_pytorch", "data", "clean", "yelp_train_labels.txt")
+            ROOT, "linguistic_style_transfer_pytorch", "data", "clean", "yelp_train_labels.test")
         self.pos_sentiment_file_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data", "lexicon", "positive-words.txt")
         self.neg_sentiment_file_path = os.path.join(
@@ -65,7 +65,7 @@ class ModelConfig:
         self.vocab_size = 9203
         self.epochs = 20
         # batch setting
-        self.batch_size = 128
+        self.batch_size = 64
         # layer sizes
         self.embedding_size = 300
         self.hidden_dim = 256
