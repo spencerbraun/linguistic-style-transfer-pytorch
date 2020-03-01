@@ -3,20 +3,23 @@ import os
 import argparse
 import numpy as np
 import pickle
+import json
 from linguistic_style_transfer_pytorch.config import GeneralConfig
 from linguistic_style_transfer_pytorch.model import AdversarialVAE
 
 
 gconfig = GeneralConfig()
+config = GeneralConfig()
 
 # load word embeddings
 weights = torch.FloatTensor(np.load(gconfig.word_embedding_path))
 # load checkpoint
-model_checkpoint = torch.load('checkpoints/model_epoch_20.pt')
+model_checkpoint = torch.load('linguistic_style_transfer_pytorch/checkpoints/model_epoch_20.pt')
 # Load model
-model = AdversarialVAE(weights=weights)
+model = AdversarialVAE(weight=weights)
 model.load_state_dict(model_checkpoint)
 model.eval()
+import ipdb; ipdb.set_trace()
 # Load average style embeddings
 with open(config.avg_style_emb_path, 'rb') as f:
     avg_style_embeddings = pickle.load(f)
@@ -30,9 +33,10 @@ with open(gconfig.i2w_file_path) as f:
     index2word = json.load(f)
 label2index = {'neg': 0, 'pos': 1}
 # Read input sentence
-source_sentence = input("Enter the source sentence")
-target_style = input("Enter the target style: pos or neg")
+source_sentence = "this soup is good"#input("Enter the source sentence")
+target_style = "neg"#input("Enter the target style: pos or neg")
 # Get token ids
+
 token_ids = [word2index.get(word, gconfig.unk_token)
              for word in source_sentence.split()]
 token_ids = torch.LongTensor(token_ids)

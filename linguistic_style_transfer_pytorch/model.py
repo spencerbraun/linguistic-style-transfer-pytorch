@@ -3,6 +3,7 @@ import torch.nn as nn
 from linguistic_style_transfer_pytorch.config import ModelConfig, GeneralConfig
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 import math
+import numpy as np
 
 mconfig = ModelConfig()
 gconfig = GeneralConfig()
@@ -86,6 +87,7 @@ class AdversarialVAE(nn.Module):
         # pack the sequences to reduce unnecessary computations
         # It requires the sentences to be sorted in descending order to take
         # full advantage
+        import ipdb; ipdb.set_trace()
         seq_lengths, perm_index = seq_lengths.sort(descending=True)
         sequences = sequences[perm_index]
         embedded_seqs = self.dropout(self.embedding(sequences))
@@ -455,21 +457,21 @@ class AdversarialVAE(nn.Module):
                 output_sentences[idx] = next_word_logits
         # if inference mode is on
         else:
-
+            import ipdb; ipdb.set_trace()
             sos_token_tensor = torch.LongTensor(
-                [gconfig.predefined_word_index['<sos>']], device=latent_emb.device).unsqueeze(0)
+                [gconfig.predefined_word_index['<sos>']], device=latent_emb.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
             word_emb = self.embedding(sos_token_tensor)
             hidden_states = torch.zeros(
                 1, mconfig.hidden_dim, device=latent_emb.device)
             # Store output sentences
             output_sentence = torch.zeros(
                 mconfig.max_seq_len, 1, device=latent_emb.device)
-            with torch.no_grad:
+            with torch.no_grad():
                 # Greedily generate new words at a time
                 for idx in range(mconfig.max_seq_len):
-                    hidden_state = self.decoder(word_emb, hidden_state)
+                    hidden_states = self.decoder(word_emb, hidden_states)
                     next_word_probs = nn.Softmax(dim=1)(
-                        self.projector(hidden_state))
+                        self.projector(hidden_states))
                     next_word = next_word_probs.argmax(1)
                     output_sentence[idx] = next_word
                     word_emb = self.embedding(next_word)
@@ -492,10 +494,10 @@ class AdversarialVAE(nn.Module):
 
         return recon_loss
 
-    def transfer_style(self, sequence, style):
+    def transfer_style(self, sequences, seq_lengths, style):
         """
         Args:
-            sequence : token indices of input sentence of shape = (random_seq_length,) 
+            sequence : token indices of input sentence of shape = (random_seq_length,)
             style: target style
         Returns:
             transfered_sentence: token indices of style transfered sentence, shape=(random_seq_length,)
@@ -503,25 +505,41 @@ class AdversarialVAE(nn.Module):
         # pack the sequences to reduce unnecessary computations
         # It requires the sentences to be sorted in descending order to take
         # full advantage
-
-        embedded_seq = self.embedding(sequence.unsqueeze(0))
-        output, final_hidden_state = self.encoder(embedded_seq)
-
+        # import ipdb; ipdb.set_trace()
+        # embedded_seqs = self.embedding(sequence.unsqueeze(0))
+        # output, final_hidden_state = self.encoder(embedded_seq)
+        seq_lengths, perm_index = seq_lengths.sort(descending=True)
+        sequences = sequences[perm_index]
+        embedded_seqs = self.embedding(sequences)
+        print(embedded_seqs.shape)
+        # seq_lengths = torch.from_numpy(np.array([4]))
+        packed_seqs = pack_padded_sequence(
+            embedded_seqs, lengths=seq_lengths, batch_first=True)
+        packed_output, (_) = self.encoder(packed_seqs)
+        output, _ = pad_packed_sequence(packed_output, batch_first=True)
+        print(output.shape)
+        sentence_emb = output[torch.arange(output.size(0)), seq_lengths-1]
+        print(sentence_emb.shape)
+        
         # get content embeddings
         # Note that we need not calculate style embeddings since we
         # use the target style embedding
         content_emb_mu, content_emb_log_var = self.get_content_emb(
-            final_hidden_state)
+            sentence_emb)
+        print(content_emb_mu.shape)
         # sample content embeddings latent space
         sampled_content_emb = self.sample_prior(
             content_emb_mu, content_emb_log_var)
+        print(sampled_content_emb.shape)
         # Get the approximate estimate of the target style embedding
-        target_style_emb = self.avg_style_emb[style]
+        # import ipdb; ipdb.set_trace()
+        target_style_emb = self.avg_style_emb[1].repeat(128).view([128,8])
+        print(target_style_emb.shape)
         # Generative embedding
         generative_emb = torch.cat(
             (target_style_emb, sampled_content_emb), axis=1)
         # Generate the style transfered sentences
         transfered_sentence = self.generate_sentences(
-            input_sentencs=None, latent_emb=generative_emb, inference=True)
+            input_sentences=None, latent_emb=generative_emb, inference=True)
 
         return transfered_sentence.view(-1)
