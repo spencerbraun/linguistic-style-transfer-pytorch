@@ -42,6 +42,6 @@ token_ids = [word2index.get(word, gconfig.unk_token)
 token_ids = torch.LongTensor(token_ids)
 target_style_id = torch.LongTensor(label2index[target_style])
 # Get transfered sentence token ids
-target_tokenids = model.transfer_style(token_ids, target_style_id)
+target_tokenids = model.transfer_style(token_ids, target_style_id, 1)
 target_sentence = "".join([index2word.get(idx) for idx in target_tokenids])
 print("Style transfered sentence: {}".format(target_sentence))
