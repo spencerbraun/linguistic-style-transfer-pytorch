@@ -16,7 +16,6 @@ if __name__ == "__main__":
     gconfig = GeneralConfig()
     weights = torch.FloatTensor(np.load(gconfig.word_embedding_path))
     model = AdversarialVAE(weight=weights)
-    import ipdb; ipdb.set_trace()
     if use_cuda:
         model = model.to("cuda")
 
@@ -41,7 +40,6 @@ if __name__ == "__main__":
 
             # unpacking
             sequences, seq_lens, labels, bow_rep = batch
-            import ipdb; ipdb.set_trace()
             if use_cuda:
                 sequences = sequences.cuda()
                 seq_lens = seq_lens.cuda()

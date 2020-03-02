@@ -8,6 +8,7 @@ import numpy as np
 mconfig = ModelConfig()
 gconfig = GeneralConfig()
 
+DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 use_cuda = True if torch.cuda.is_available() else False
 
 class AdversarialVAE(nn.Module):
@@ -59,8 +60,8 @@ class AdversarialVAE(nn.Module):
         # of all the sentences of that particular label/style.
         # 0 -> negative, 1 -> positive
         self.avg_style_emb = {
-            0: torch.zeros(mconfig.style_hidden_dim),
-            1: torch.zeros(mconfig.style_hidden_dim)
+            0: torch.zeros(mconfig.style_hidden_dim, device=DEVICE),
+            1: torch.zeros(mconfig.style_hidden_dim, device=DEVICE)
         }
         # Used to maintain a running average
         self.num_neg_styles = 0
@@ -263,7 +264,7 @@ class AdversarialVAE(nn.Module):
             style_emb: batch of sampled style embeddings of the input sentences,shape = (batch_size,mconfig.style_hidden_dim)
             style_labels: style labels of the corresponding input sentences,shape = (batch_size,2)
         """
-        neg_style_label = torch.LongTensor([0, 1], device=style_emb.device)
+        neg_style_label = torch.tensor([0, 1], device=style_emb.device)
         # Iterate over the style labels
         for idx, label in enumerate(style_labels):
             # Calculate average for negative style
@@ -431,8 +432,9 @@ class AdversarialVAE(nn.Module):
         # Training mode
         if not inference:
             # Prepend the input sentences with <sos> token
-            sos_token_tensor = torch.LongTensor(
-                [gconfig.predefined_word_index['<sos>']], device=input_sentences.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
+            sos_token_tensor = torch.tensor(
+                [gconfig.predefined_word_index['<sos>']], 
+                device=input_sentences.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
             input_sentences = torch.cat(
                 (sos_token_tensor, input_sentences), dim=1)
             sentence_embs = self.dropout(self.embedding(input_sentences))
@@ -460,7 +462,7 @@ class AdversarialVAE(nn.Module):
         # if inference mode is on
         else:
             
-            sos_token_tensor = torch.LongTensor(
+            sos_token_tensor = torch.tensor(
                 [gconfig.predefined_word_index['<sos>']], device=latent_emb.device).unsqueeze(0).repeat(mconfig.batch_size, 1)
             word_emb = self.embedding(sos_token_tensor)
             hidden_states = torch.zeros(
