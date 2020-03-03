@@ -39,20 +39,20 @@ class Preprocessor():
 
     def preprocess(self):
         """
-        Preprocesses the train text data 
+        Preprocesses the train text data
         """
         print("Preprocessing started")
         with open(config.train_text_file_path, 'w') as text_file, open(config.train_labels_file_path, 'w') as labels_file:
-            with open(config.train_pos_reviews_file_path, 'r') as reviews_file:
-                for line in reviews_file:
+            with open(config.train_pos_reviews_file_path, 'r') as pos_reviews_file:
+                for line in pos_reviews_file:
                     line = self._clean_text(line)
                     if len(line) > 0:
                         text_file.write(line + "\n")
                         labels_file.write("pos" + "\n")
-            with open(config.train_neg_reviews_file_path, 'r') as reviews_file:
-                for line in reviews_file:
+            with open(config.train_neg_reviews_file_path, 'r') as neg_reviews_file:
+                for line in neg_reviews_file:
                     line = self._clean_text(line)
                     if len(line) > 0:
                         text_file.write(line + "\n")
-                        labels_file.write("pos" + "\n")
+                        labels_file.write("neg" + "\n")
         print("Processing complete ")
