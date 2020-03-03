@@ -11,15 +11,15 @@ class GeneralConfig:
     def __init__(self):
         # original vocab size
         self.vocab_size = 9200
-        self.bow_hidden_dim = 7190
+        self.bow_hidden_dim = 8881
         self.data_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data")
         self.vocab_save_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data")
         self.train_pos_reviews_file_path = os.path.join(
-            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "allsophs.txt")
+            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "soph_train.txt")
         self.train_neg_reviews_file_path = os.path.join(
-            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "allnaive.txt")
+            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "naive_train.txt")
         self.train_text_file_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data", "clean", "soph_train_data.txt")
         self.train_labels_file_path = os.path.join(
@@ -51,7 +51,7 @@ class GeneralConfig:
             "<sos>": 1,
             "<unk>": 2,
         }
-        self.filter_sentiment_words = True
+        self.filter_sentiment_words = False
         self.filter_stopwords = True
 
 
@@ -74,11 +74,11 @@ class ModelConfig:
         # generative embedding dim = style_hidden_dim + content_hidden_dim
         self.generative_emb_dim = 136
         self.num_style = 2
-        self.content_bow_dim = 7190
+        self.content_bow_dim = 8881
         # dropout
         self.dropout = 0.8
         # sequence length settings
-        self.max_seq_len = 76
+        self.max_seq_len = 40
         # learning rates
         self.autoencoder_lr = 0.001
         self.style_adversary_lr = 0.001
