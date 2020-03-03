@@ -16,23 +16,23 @@ gconfig = GeneralConfig()
 # YELP_DATA_NEG = 'https://raw.githubusercontent.com/shentianxiao/language-style-transfer/master/data/yelp/sentiment.train.0'
 # YELP_DATA_POS = 'https://raw.githubusercontent.com/shentianxiao/language-style-transfer/master/data/yelp/sentiment.train.1'
 # Make raw data folder
-try:
-    os.mkdir(gconfig.data_path+'/raw')
-except:
-    pass
+# try:
+#     os.mkdir(gconfig.data_path+'/raw')
+# except:
+#     pass
 # subprocess.call('wget '+YELP_DATA_NEG, shell=True)
 # subprocess.call('wget '+YELP_DATA_POS, shell=True)
-# Rename the raw data files and move them to the raw data folder
+# # Rename the raw data files and move them to the raw data folder
 # subprocess.call('mv sentiment.train.0 ' +
 #                gconfig.data_path+'/raw/yelp_train_neg.txt')
 # subprocess.call('mv sentiment.train.1 ' +
 #                gconfig.data_path+'/raw/yelp_train_pos.txt')
 
 # Create clean data directory to store the preprocessed data
-try:
-    os.mkdir(gconfig.data_path+'/clean')
-except:
-    pass
+# try:
+#     os.mkdir(gconfig.data_path+'/clean')
+# except:
+#     pass
 # Start preprocessing
 preprocessor = preprocess.Preprocessor()
 preprocessor.preprocess()
